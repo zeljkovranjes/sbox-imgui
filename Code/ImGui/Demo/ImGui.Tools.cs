@@ -9,6 +9,8 @@ public static partial class ImGui
 	/// <summary>Create a Metrics/Debugger window: internal state, windows, draw lists, items.</summary>
 	public static void ShowMetricsWindow( ref bool open )
 	{
+		if ( !open )
+			return;
 		var g = G;
 		var io = g.IO;
 		if ( !Begin( "Dear ImGui Metrics/Debugger", ref open ) )
@@ -110,6 +112,8 @@ public static partial class ImGui
 	/// <summary>Create an About window: version, credits.</summary>
 	public static void ShowAboutWindow( ref bool open )
 	{
+		if ( !open )
+			return;
 		if ( !Begin( "About Dear ImGui", ref open, ImGuiWindowFlags.AlwaysAutoResize ) )
 		{
 			End();

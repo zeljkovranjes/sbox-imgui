@@ -44,13 +44,17 @@ public sealed class ImGuiTestHarness : Component
 		switch ( Mode )
 		{
 			case "demo":
-				ImGui.ShowDemoWindow( ref _demoOpen );
+				if ( _demoOpen )
+					ImGui.ShowDemoWindow( ref _demoOpen );
 				break;
 			case "selftest":
 				ImGuiSelfTest.Update();
 				break;
 			default:
-				DrawBasicGallery();
+				if ( Page <= 0 )
+					DrawBasicGallery();
+				else
+					ImGuiGallery.Draw( Page - 1 );
 				break;
 		}
 	}

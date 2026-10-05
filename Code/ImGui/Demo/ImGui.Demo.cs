@@ -39,6 +39,10 @@ public static partial class ImGui
 	/// <summary>Create a demo window demonstrating most ImGui features. Pass a bool to get a close button.</summary>
 	public static void ShowDemoWindow( ref bool open )
 	{
+		// Closed with the X button: stay closed until the caller sets open = true again.
+		if ( !open )
+			return;
+
 		if ( Demo.ShowAppMainMenuBar ) Demo.ShowExampleAppMainMenuBar();
 		if ( Demo.ShowAppConsole ) Demo.ShowExampleAppConsole( ref Demo.ShowAppConsole );
 		if ( Demo.ShowAppLog ) Demo.ShowExampleAppLog( ref Demo.ShowAppLog );

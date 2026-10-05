@@ -113,6 +113,15 @@ public static partial class ImGuiSelfTest
 			ImGui.End();
 		}, Test_Close );
 
+		Add( "Demo window X closes it", () =>
+		{
+			if ( !_demoTestOpen ) return;
+			ImGui.ShowDemoWindow( ref _demoTestOpen );
+			// ShowDemoWindow sets its own initial position: move it afterwards (applies next frame).
+			ImGui.SetWindowPos( "Dear ImGui Demo", new Vector2( 60, 60 ) );
+			ImGui.SetWindowSize( "Dear ImGui Demo", new Vector2( 400, 300 ) );
+		}, Test_DemoClose );
+
 		Add( "Combo", () =>
 		{
 			if ( TestWindow( "T Combo", new Vector2( 320, 150 ) ) )
@@ -359,6 +368,18 @@ public static partial class ImGuiSelfTest
 		var closeBtn = new Vector2( _winPos.x + _winSize.x - ImGui.GetStyle().FramePadding.x - ImGui.GetFontSize() * 0.5f - 1, _winPos.y + ImGui.GetFrameHeight() * 0.5f );
 		foreach ( var f in Click( closeBtn ) ) yield return f;
 		Check( !_winOpen, "close button should set open=false" );
+	}
+
+	private static bool _demoTestOpen = true;
+
+	private static IEnumerator<object> Test_DemoClose()
+	{
+		_demoTestOpen = true;
+		foreach ( var f in Frames( 4 ) ) yield return f;
+		var closeBtn = new Vector2( 60 + 400 - ImGui.GetStyle().FramePadding.x - ImGui.GetFontSize() * 0.5f - 1, 60 + ImGui.GetFrameHeight() * 0.5f );
+		foreach ( var f in Click( closeBtn ) ) yield return f;
+		foreach ( var f in Frames( 3 ) ) yield return f;
+		Check( !_demoTestOpen, "clicking the demo window X should set open=false and keep it closed" );
 	}
 
 	private static IEnumerator<object> Test_Combo()
