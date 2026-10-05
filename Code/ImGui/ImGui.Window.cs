@@ -195,6 +195,13 @@ public static partial class ImGui
 		return sizeAutoFit;
 	}
 
+	internal static Vector2 CalcWindowNextAutoFitSize( ImGuiWindow window )
+	{
+		CalcWindowContentSizes( window, out _, out var sizeContentsIdeal );
+		var sizeAutoFit = CalcWindowAutoFitSize( window, sizeContentsIdeal );
+		return CalcWindowSizeAfterConstraint( window, sizeAutoFit );
+	}
+
 	private static void ClampWindowPos( ImGuiWindow window, ImRect visibilityRect )
 	{
 		var g = G;
