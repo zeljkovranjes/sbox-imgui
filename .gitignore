@@ -26,3 +26,8 @@ code/Properties/*
 
 # Exported / standalone games
 Exports/
+
+# editor rig
+dev/editor-rig/.mcp-url
+**/RebuildTrigger.cs
+__pycache__/

@@ -4,22 +4,20 @@
     {
       "__guid": "0749f833-75fc-43bb-84a6-8b3e2da184bc",
       "Flags": 0,
-      "Name": "Object",
+      "Name": "ImGui Demo",
       "Enabled": true,
       "Components": [
         {
-          "__type": "Sandbox.ImGuiDemo",
+          "__type": "Duccsoft.ImGui.Samples.ImGuiDemoWindowComponent",
           "__guid": "d3b2cfe7-8251-4f9f-848d-47ec46595224",
-          "ExampleComponent": {
-            "_type": "component",
-            "component_id": "77f8aaab-ce3c-4d38-9e58-2bed690c500a",
-            "go": "0749f833-75fc-43bb-84a6-8b3e2da184bc",
-            "component_type": "ExampleComponent"
-          },
-          "ExampleTexture": "textures/dev/blue_noise_256.vtex"
+          "ShowDemoWindow": true,
+          "ShowMetricsWindow": false,
+          "ShowStyleEditor": false,
+          "ShowAboutWindow": false,
+          "ShowCursor": true
         },
         {
-          "__type": "Sandbox.ExampleComponent",
+          "__type": "Duccsoft.ImGui.Samples.ExampleComponent",
           "__guid": "77f8aaab-ce3c-4d38-9e58-2bed690c500a",
           "Checkbox": true,
           "ColorEdit4": "1,0.6,0,1",
@@ -32,7 +30,18 @@
           "SliderFloat2": "0,0",
           "SliderFloat3": "0,0,0",
           "SliderFloat4": "0,0,0,0",
-          "SliderInt": 8
+          "SliderInt": 8,
+          "Text": "Hello, world!"
+        },
+        {
+          "__type": "Duccsoft.ImGui.Samples.ImGuiInspectorComponent",
+          "__guid": "5c1e7c55-4f61-4a43-9a2a-6c1c3f1d0b01",
+          "Target": {
+            "_type": "component",
+            "component_id": "77f8aaab-ce3c-4d38-9e58-2bed690c500a",
+            "go": "0749f833-75fc-43bb-84a6-8b3e2da184bc",
+            "component_type": "ExampleComponent"
+          }
         }
       ]
     },

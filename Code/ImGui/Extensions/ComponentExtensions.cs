@@ -14,7 +14,7 @@ public static class ComponentExtensions
 
 		var typeDesc = TypeLibrary.GetType( type );
 		props = typeDesc?.Properties
-			.Where( p => p.HasAttribute<PropertyAttribute>() && p.CanRead )
+			.Where( p => p.HasAttribute<PropertyAttribute>() && p.CanRead && !typeof( Delegate ).IsAssignableFrom( p.PropertyType ) )
 			.ToList() ?? new List<PropertyDescription>();
 		_propertyCache[type] = props;
 		return props;
@@ -43,6 +43,9 @@ public static class ComponentExtensions
 		ImGui.PushID( component.Id.GetHashCode() );
 		for ( int i = 0; i < properties.Count; i++ )
 		{
+			// Skip event hooks (OnComponentEnabled etc.): delegates are not editable data.
+			if ( typeof( Delegate ).IsAssignableFrom( properties[i].PropertyType ) )
+				continue;
 			ImGui.PushID( i );
 			component.ImGuiProperty( properties[i] );
 			ImGui.PopID();

@@ -282,6 +282,10 @@
         {
           "__type": "ImGuiTests.ImGuiTestHarness",
           "__guid": "7c2a1d10-5d0e-4c43-9a49-1b5a8e4a0003"
+        },
+        {
+          "__type": "Duccsoft.ImGui.Samples.ExampleComponent",
+          "__guid": "7c2a1d10-5d0e-4c43-9a49-1b5a8e4a0004"
         }
       ]
     }

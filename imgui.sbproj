@@ -1,5 +1,5 @@
 {
-  "Title": "Dear ImGui Clone",
+  "Title": "Dear ImGui",
   "Type": "library",
   "Org": "duccsoft",
   "Ident": "imgui",
@@ -23,6 +23,9 @@
       "AssemblyReferences": [],
       "IgnoreFolders": [],
       "DistinctAssemblyReferences": []
-    }
+    },
+    "Summary": "Immediate-mode Dear ImGui (1.91 API) for s&box: windows, menus, popups, tables, tabs, inputs, sliders, color pickers, plots, drag & drop and a full demo window.",
+    "Description": "A C# port of the Dear ImGui API rendered through s&box's Painter. Call ImGui functions from any component's OnUpdate. See docs.md in the repository for usage of every widget.",
+    "WebsiteUrl": "https://github.com/zeljkovranjes/sbox-imgui"
   }
 }

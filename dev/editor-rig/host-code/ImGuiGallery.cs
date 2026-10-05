@@ -131,6 +131,8 @@ public static class ImGuiGallery
 		if ( ImGui.Begin( "Inspector" ) )
 		{
 			var example = Game.ActiveScene?.GetAllComponents<Duccsoft.ImGui.Samples.ExampleComponent>().FirstOrDefault();
+			if ( example is null && Game.ActiveScene is not null )
+				example = Game.ActiveScene.CreateObject().Components.Create<Duccsoft.ImGui.Samples.ExampleComponent>();
 			if ( example is null )
 				ImGui.TextDisabled( "(no ExampleComponent in scene)" );
 			else
