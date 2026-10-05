@@ -460,6 +460,9 @@ public static partial class ImGui
 			return false;
 		if ( g.HoveredId != 0 && g.HoveredId != id && !g.HoveredIdAllowOverlap )
 			return false;
+		// An item that allows overlap yields hover to whichever overlapping item was hovered last frame.
+		if ( (itemFlags & ImGuiItemFlags.AllowOverlap) != 0 && id != 0 && g.HoveredIdPreviousFrame != id && g.HoveredIdPreviousFrame != 0 )
+			return false;
 		if ( g.ActiveId != 0 && g.ActiveId != id && !g.ActiveIdAllowOverlap )
 			return false;
 		if ( (itemFlags & ImGuiItemFlags.NoWindowHoverableCheck) == 0 && !IsWindowContentHoverable( window ) )
