@@ -20,8 +20,24 @@ public sealed class ImGuiTestHarness : Component
 	private bool _check = true;
 	private int _radio = 1;
 	private bool _demoOpen = true;
+	public bool DemoOpen => _demoOpen;
+
+	public static string LastError;
 
 	protected override void OnUpdate()
+	{
+		try
+		{
+			UpdateInner();
+		}
+		catch ( Exception e )
+		{
+			LastError = e.ToString();
+			throw;
+		}
+	}
+
+	private void UpdateInner()
 	{
 		Mouse.Visible = true;
 

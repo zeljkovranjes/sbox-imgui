@@ -516,6 +516,7 @@ public static partial class ImGui
 				if ( g.HoveredIdTimer - io.DeltaTime <= 0.70f && g.HoveredIdTimer >= 0.70f )
 				{
 					pressed = true;
+					g.DragDropHoldJustPressedId = id;
 					FocusWindow( window );
 				}
 			}

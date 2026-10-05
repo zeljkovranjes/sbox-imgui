@@ -50,17 +50,24 @@ public static partial class ImGuiSelfTest
 		var sb = new StringBuilder();
 		int pass = _tests.Count( t => t.Result == "PASS" );
 		int fail = _tests.Count( t => t.Result is not null && t.Result != "PASS" );
-		sb.Append( $"{(_finished ? "DONE" : "RUNNING")} pass={pass} fail={fail} total={_tests.Count}\n" );
+		sb.Append( $"{(_finished ? "DONE" : "RUNNING")} pass={pass} fail={fail} total={_tests.Count} updates={_updates} current={_current} mode={ImGuiTestHarness.Mode} diag={_diag} err={ImGuiTestHarness.LastError}\n" );
 		foreach ( var t in _tests )
 			sb.Append( $"{t.Result ?? "pending"} | {t.Name}\n" );
 		return sb.ToString();
 	}
 
+	private static int _updates;
+	private static string _diag;
+
 	public static void Update()
 	{
+		_updates++;
 		var system = ImGuiSystem.Current;
 		if ( system is null )
+		{
+			_diag = "ImGuiSystem.Current is null";
 			return;
+		}
 
 		if ( !_running )
 		{
