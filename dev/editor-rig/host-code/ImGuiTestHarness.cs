@@ -44,7 +44,7 @@ public sealed class ImGuiTestHarness : Component
 		switch ( Mode )
 		{
 			case "demo":
-				// ImGui.ShowDemoWindow( ref _demoOpen ); (enabled once the demo window exists)
+				ImGui.ShowDemoWindow( ref _demoOpen );
 				break;
 			case "selftest":
 				ImGuiSelfTest.Update();

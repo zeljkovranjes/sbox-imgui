@@ -1,179 +1,196 @@
-﻿using System;
-using System.Collections.Generic;
-
 namespace Duccsoft.ImGui;
 
+/// <summary>
+/// Draws an ImGui inspector for any component's [Property] members.
+/// </summary>
 public static class ComponentExtensions
 {
+	private static readonly Dictionary<Type, List<PropertyDescription>> _propertyCache = new();
+
+	private static List<PropertyDescription> GetProperties( Type type )
+	{
+		if ( _propertyCache.TryGetValue( type, out var props ) )
+			return props;
+
+		var typeDesc = TypeLibrary.GetType( type );
+		props = typeDesc?.Properties
+			.Where( p => p.HasAttribute<PropertyAttribute>() && p.CanRead )
+			.ToList() ?? new List<PropertyDescription>();
+		_propertyCache[type] = props;
+		return props;
+	}
+
+	/// <summary>
+	/// Draw an editor for every [Property] of this component. If called outside of a window, a window named after the component type is created.
+	/// </summary>
 	public static void ImGuiInspector( this Component component )
 	{
-		void PrintProperties( List<PropertyDescription> properties )
-		{
-			for ( int i = 0; i < properties.Count; i++ )
-			{
-				ImGui.PushID( i );
-				ImGuiProperty( component, properties[i] );
-				ImGui.PopID();
-			}
-		}
-
 		if ( !component.IsValid() )
 			return;
 
-		var typeDesc = ImGuiSystem.Current.GetTypeDescription( component.GetType() );
-		var properties = ImGuiSystem.Current.GetProperties( component.GetType() );
-		if ( ImGui.CurrentWindow is not null )
+		var properties = GetProperties( component.GetType() );
+		bool ownWindow = ImGui.G.CurrentWindow is null || ImGui.G.CurrentWindow.IsFallbackWindow;
+		if ( ownWindow )
 		{
-			PrintProperties( properties );
-		}
-		else
-		{
-			if ( ImGui.Begin( typeDesc.ClassName ) )
+			var title = TypeLibrary.GetType( component.GetType() )?.Title ?? component.GetType().Name;
+			if ( !ImGui.Begin( $"{title}###{component.Id}" ) )
 			{
-				PrintProperties( properties );
+				ImGui.End();
+				return;
 			}
-			ImGui.End();
 		}
+
+		ImGui.PushID( component.Id.GetHashCode() );
+		for ( int i = 0; i < properties.Count; i++ )
+		{
+			ImGui.PushID( i );
+			component.ImGuiProperty( properties[i] );
+			ImGui.PopID();
+		}
+		ImGui.PopID();
+
+		if ( ownWindow )
+			ImGui.End();
 	}
 
-	private static Dictionary<Type, Action<Component, PropertyDescription>> _propertyPrintStrategy = new()
-	{
-		{ typeof(float), ImGuiFloatProperty },
-		{ typeof(int), ImGuiIntProperty },
-		{ typeof(bool), ImGuiBoolProperty },
-		{ typeof(Vector2), ImGuiVector2Property },
-		{ typeof(Vector3), ImGuiVector3Property },
-		{ typeof(Vector4), ImGuiVector4Property },
-	};
-
-	public static void ImGuiProperty( this Component component, PropertyDescription prop )
+	/// <summary>
+	/// Draw an editor for one property. Returns true if the value was changed.
+	/// </summary>
+	public static bool ImGuiProperty( this Component component, PropertyDescription prop )
 	{
 		if ( !component.IsValid() || prop is null )
-			return;
+			return false;
 
-		if ( !_propertyPrintStrategy.TryGetValue( prop.PropertyType, out var strategy ) )
-			return;
-
-		strategy( component, prop );
-	}
-
-	private static void ImGuiFloatProperty( Component component, PropertyDescription prop )
-	{
+		var label = prop.Title ?? prop.Name;
+		var type = prop.PropertyType;
 		var range = prop.GetCustomAttribute<RangeAttribute>();
-		if ( range is not null )
+		bool readOnly = !prop.CanWrite;
+		object value;
+		try
 		{
-			ImGuiSliderFloatProperty( component, prop, range.Min, range.Max );
+			value = prop.GetValue( component );
+		}
+		catch ( Exception )
+		{
+			return false;
+		}
+
+		if ( readOnly )
+			ImGui.BeginDisabled();
+
+		bool changed = false;
+		object newValue = value;
+
+		if ( type == typeof( float ) )
+		{
+			var v = (float)value;
+			changed = range is not null
+				? ImGui.SliderFloat( label, ref v, range.Min, range.Max )
+				: ImGui.DragFloat( label, ref v, 0.1f );
+			newValue = v;
+		}
+		else if ( type == typeof( double ) )
+		{
+			var v = (double)value;
+			var f = (float)v;
+			changed = range is not null
+				? ImGui.SliderFloat( label, ref f, range.Min, range.Max )
+				: ImGui.DragFloat( label, ref f, 0.1f );
+			newValue = (double)f;
+		}
+		else if ( type == typeof( int ) )
+		{
+			var v = (int)value;
+			changed = range is not null
+				? ImGui.SliderInt( label, ref v, (int)range.Min, (int)range.Max )
+				: ImGui.DragInt( label, ref v, 0.2f );
+			newValue = v;
+		}
+		else if ( type == typeof( bool ) )
+		{
+			var v = (bool)value;
+			changed = ImGui.Checkbox( label, ref v );
+			newValue = v;
+		}
+		else if ( type == typeof( string ) )
+		{
+			var v = (string)value ?? string.Empty;
+			changed = ImGui.InputText( label, ref v );
+			newValue = v;
+		}
+		else if ( type == typeof( Vector2 ) )
+		{
+			var v = (Vector2)value;
+			changed = range is not null
+				? ImGui.SliderFloat2( label, ref v, range.Min, range.Max )
+				: ImGui.DragFloat2( label, ref v, 0.1f );
+			newValue = v;
+		}
+		else if ( type == typeof( Vector3 ) )
+		{
+			var v = (Vector3)value;
+			changed = range is not null
+				? ImGui.SliderFloat3( label, ref v, range.Min, range.Max )
+				: ImGui.DragFloat3( label, ref v, 0.1f );
+			newValue = v;
+		}
+		else if ( type == typeof( Vector4 ) )
+		{
+			var v = (Vector4)value;
+			changed = range is not null
+				? ImGui.SliderFloat4( label, ref v, range.Min, range.Max )
+				: ImGui.DragFloat4( label, ref v, 0.1f );
+			newValue = v;
+		}
+		else if ( type == typeof( Angles ) )
+		{
+			var a = (Angles)value;
+			var v = new Vector3( a.pitch, a.yaw, a.roll );
+			changed = ImGui.DragFloat3( label, ref v, 0.5f );
+			newValue = new Angles( v.x, v.y, v.z );
+		}
+		else if ( type == typeof( Rotation ) )
+		{
+			var a = ((Rotation)value).Angles();
+			var v = new Vector3( a.pitch, a.yaw, a.roll );
+			changed = ImGui.DragFloat3( label, ref v, 0.5f );
+			newValue = Rotation.From( new Angles( v.x, v.y, v.z ) );
+		}
+		else if ( type == typeof( Color ) )
+		{
+			var v = (Color)value;
+			changed = ImGui.ColorEdit4( label, ref v );
+			newValue = v;
+		}
+		else if ( type.IsEnum )
+		{
+			var names = Enum.GetNames( type );
+			var values = Enum.GetValues( type );
+			int current = Array.IndexOf( values, value );
+			changed = ImGui.Combo( label, ref current, names );
+			if ( changed && current >= 0 )
+				newValue = values.GetValue( current );
 		}
 		else
 		{
-			// TODO: Draw DragFloat
+			ImGui.LabelText( label, "{0}", value?.ToString() ?? "null" );
 		}
-	}
 
-	private static void ImGuiSliderFloatProperty( Component component, PropertyDescription prop, float min, float max )
-	{
-		ImGui.Text( prop.Name ); ImGui.SameLine();
-		var value = (float)prop.GetValue( component );
-		ImGui.SliderFloat( prop.Name, ref value, min, max, "F3" );
-		prop.SetValue( component, value );
-	}
+		if ( readOnly )
+			ImGui.EndDisabled();
 
-	private static void ImGuiIntProperty( Component component, PropertyDescription prop )
-	{
-		var range = prop.GetCustomAttribute<RangeAttribute>();
-		if ( range is not null )
+		if ( changed && !readOnly )
 		{
-			ImGuiSliderIntProperty( component, prop, (int)range.Min, (int)range.Max );
+			try
+			{
+				prop.SetValue( component, newValue );
+			}
+			catch ( Exception e )
+			{
+				Log.Warning( $"ImGuiInspector: could not set {prop.Name}: {e.Message}" );
+				return false;
+			}
 		}
-		else
-		{
-			ImGuiDragIntProperty( component, prop );
-		}
-	}
-
-	private static void ImGuiSliderIntProperty( Component component, PropertyDescription prop, int min, int max )
-	{
-		ImGui.Text( prop.Name ); ImGui.SameLine();
-		var value = (int)prop.GetValue( component );
-		ImGui.SliderInt( prop.Name, ref value, min, max );
-		prop.SetValue( component, value );
-	}
-
-	private static void ImGuiDragIntProperty( Component component, PropertyDescription prop )
-	{
-		ImGui.Text( prop.Name ); ImGui.SameLine();
-		var value = (int)prop.GetValue( component );
-		ImGui.DragInt( prop.Name, ref value, 0.2f );
-		prop.SetValue( component, value );
-	}
-
-	private static void ImGuiBoolProperty( Component component, PropertyDescription prop )
-	{
-		var value = (bool)prop.GetValue( component );
-		ImGui.Checkbox( prop.Name, ref value );
-		prop.SetValue( component, value );
-	}
-
-	private static void ImGuiVector2Property( Component component, PropertyDescription prop )
-	{
-		var range = prop.GetCustomAttribute<RangeAttribute>();
-		if ( range is not null )
-		{
-			ImGuiSliderFloat2Property( component, prop, range.Min, range.Max );
-		}
-		else
-		{
-			// TODO: Add DragFloat2
-		}
-	}
-
-	private static void ImGuiSliderFloat2Property( Component component, PropertyDescription prop, float min, float max )
-	{
-		ImGui.Text( prop.Name ); ImGui.SameLine();
-		var value = (Vector2)prop.GetValue( component );
-		ImGui.SliderFloat2( prop.Name, ref value, min, max );
-		prop.SetValue( component, value );
-	}
-
-	private static void ImGuiVector3Property( Component component, PropertyDescription prop )
-	{
-		var range = prop.GetCustomAttribute<RangeAttribute>();
-		if ( range is not null )
-		{
-			ImGuiSliderFloat3Property( component, prop, range.Min, range.Max );
-		}
-		else
-		{
-			// TODO: Add DragFloat3
-		}
-	}
-
-	private static void ImGuiSliderFloat3Property( Component component, PropertyDescription prop, float min, float max )
-	{
-		ImGui.Text( prop.Name ); ImGui.SameLine();
-		var value = (Vector3)prop.GetValue( component );
-		ImGui.SliderFloat3( prop.Name, ref value, min, max );
-		prop.SetValue( component, value );
-	}
-
-	private static void ImGuiVector4Property( Component component, PropertyDescription prop )
-	{
-		var range = prop.GetCustomAttribute<RangeAttribute>();
-		if ( range is not null )
-		{
-			ImGuiSliderFloat4Property( component, prop, range.Min, range.Max );
-		}
-		else
-		{
-			// TODO: Add DragFloat4
-		}
-	}
-
-	private static void ImGuiSliderFloat4Property( Component component, PropertyDescription prop, float min, float max )
-	{
-		ImGui.Text( prop.Name ); ImGui.SameLine();
-		var value = (Vector4)prop.GetValue( component );
-		ImGui.SliderFloat4( prop.Name, ref value, min, max );
-		prop.SetValue( component, value );
+		return changed;
 	}
 }

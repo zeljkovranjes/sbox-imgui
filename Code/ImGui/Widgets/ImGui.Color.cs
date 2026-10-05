@@ -41,6 +41,16 @@ public static partial class ImGui
 	}
 
 	/// <summary>Edit an s&amp;box <see cref="Color"/> without its alpha channel.</summary>
+	/// <summary>Edit the RGB part of a Vector4 color, keeping its alpha.</summary>
+	public static bool ColorEdit3( string label, ref Vector4 col, ImGuiColorEditFlags flags = ImGuiColorEditFlags.None )
+	{
+		var rgb = new Vector3( col.x, col.y, col.z );
+		if ( !ColorEdit3( label, ref rgb, flags ) )
+			return false;
+		col = new Vector4( rgb.x, rgb.y, rgb.z, col.w );
+		return true;
+	}
+
 	public static bool ColorEdit3( string label, ref Color col, ImGuiColorEditFlags flags = ImGuiColorEditFlags.None )
 	{
 		var c = new float[] { col.r, col.g, col.b, 1.0f };
