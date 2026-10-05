@@ -111,6 +111,12 @@ public class ImGuiIO
 	}
 
 	private readonly List<InputEvent> _inputEvents = new();
+
+	// Text/key events are double-buffered: anything queued during a frame is delivered at the next NewFrame,
+	// so events arriving after widgets were processed are never lost.
+	private readonly List<char> _pendingCharacters = new();
+	private readonly List<KeyTyped> _pendingKeys = new();
+	private string _pendingPaste;
 	#endregion
 
 	#region Input API
@@ -132,7 +138,7 @@ public class ImGuiIO
 	public void AddInputCharacter( char c )
 	{
 		if ( c != 0 )
-			InputQueueCharacters.Add( c );
+			_pendingCharacters.Add( c );
 	}
 
 	public void AddInputCharactersUTF8( string str )
@@ -153,17 +159,20 @@ public class ImGuiIO
 	public void AddKeyTyped( ImGuiKey key, bool ctrl = false, bool shift = false, bool alt = false )
 	{
 		if ( key == ImGuiKey.None ) return;
-		InputQueueKeys.Add( new KeyTyped { Key = key, Ctrl = ctrl, Shift = shift, Alt = alt } );
+		_pendingKeys.Add( new KeyTyped { Key = key, Ctrl = ctrl, Shift = shift, Alt = alt } );
 	}
 
 	/// <summary>Queue text to be pasted into the active text input.</summary>
-	public void AddPasteEvent( string text ) => PastedText = text;
+	public void AddPasteEvent( string text ) => _pendingPaste = text;
 
 	public void ClearInputKeys()
 	{
 		Array.Clear( KeysDownFromEvents );
 		InputQueueCharacters.Clear();
 		InputQueueKeys.Clear();
+		_pendingCharacters.Clear();
+		_pendingKeys.Clear();
+		_pendingPaste = null;
 	}
 
 	/// <summary>
@@ -171,6 +180,15 @@ public class ImGuiIO
 	/// </summary>
 	internal void ProcessInputEvents()
 	{
+		InputQueueCharacters.Clear();
+		InputQueueCharacters.AddRange( _pendingCharacters );
+		_pendingCharacters.Clear();
+		InputQueueKeys.Clear();
+		InputQueueKeys.AddRange( _pendingKeys );
+		_pendingKeys.Clear();
+		PastedText = _pendingPaste;
+		_pendingPaste = null;
+
 		MouseWheel = 0;
 		MouseWheelH = 0;
 		Span<bool> changed = stackalloc bool[5];
