@@ -24,6 +24,15 @@ public sealed class ImGuiSystem : GameObjectSystem<ImGuiSystem>
 	/// <summary>When false, ImGui runs (and receives input) but is not drawn, e.g. while you render it yourself.</summary>
 	public bool RenderEnabled { get; set; } = true;
 
+	/// <summary>
+	/// When true, the system stops reading the real mouse/keyboard and you drive input yourself through
+	/// <see cref="ImGui.GetIO"/> (AddMousePosEvent, AddMouseButtonEvent, AddInputCharacter, AddKeyTyped...). Useful for automated tests.
+	/// </summary>
+	public bool SimulateInput { get; set; }
+
+	/// <summary>The IO of this scene's ImGui context, usable outside of a frame (e.g. to inject input).</summary>
+	public ImGuiIO IO => Context.IO;
+
 	private CameraComponent _targetCamera;
 	private ImGuiInputPanel _inputPanel;
 	private bool _frameStarted;
@@ -47,8 +56,11 @@ public sealed class ImGuiSystem : GameObjectSystem<ImGuiSystem>
 		var io = Context.IO;
 		io.DeltaTime = MathF.Max( RealTime.Delta, 0.0001f );
 
-		UpdateInputPanel();
-		io.MousePos = Mouse.Active || Mouse.Visible ? Mouse.Position : new Vector2( -float.MaxValue, -float.MaxValue );
+		if ( !SimulateInput )
+		{
+			UpdateInputPanel();
+			io.MousePos = Mouse.Active || Mouse.Visible ? Mouse.Position : new Vector2( -float.MaxValue, -float.MaxValue );
+		}
 
 		try
 		{
@@ -158,7 +170,7 @@ public sealed class ImGuiSystem : GameObjectSystem<ImGuiSystem>
 	/// <summary>Poll a key's state through s&amp;box's keyboard input (used when the ImGui panel does not have focus).</summary>
 	internal static bool PollKeyDown( ImGuiKey key )
 	{
-		if ( !Game.IsPlaying )
+		if ( !Game.IsPlaying || Current is { SimulateInput: true } )
 			return false;
 		var name = ImGuiKeyNames.ToSboxName( key );
 		if ( name is null || _unpollableKeys.Contains( name ) )

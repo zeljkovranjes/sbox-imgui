@@ -250,7 +250,7 @@ public static partial class ImGui
 			return;
 
 		if ( sizeArg == default )
-			sizeArg = new Vector2( -float.Epsilon, 0.0f );
+			sizeArg = new Vector2( -1.17549435E-38f, 0.0f ); // -FLT_MIN: fill available width
 
 		var style = g.Style;
 		var pos = window.DC.CursorPos;

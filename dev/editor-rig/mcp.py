@@ -1,6 +1,7 @@
 """Tiny MCP client for the in-editor sbox-mcp server (streamable HTTP, JSON-RPC).
 
 usage:
+  python mcp.py shot <tool> '<json args>' <out.png>  # save an image result
   python mcp.py list [query]                   # tool_search
   python mcp.py call <tool> '<json args>'      # tool_call
   python mcp.py raw <method> '<json params>'
@@ -51,6 +52,18 @@ def main():
     elif cmd == "call":
         args = json.loads(sys.argv[3]) if len(sys.argv) > 3 else {}
         print(text_of(rpc("tools/call", {"name": "tool_call", "arguments": {"name": sys.argv[2], "arguments": args}})))
+    elif cmd == "shot":
+        # python mcp.py shot <tool> '<json args>' <out.png> : saves the first image content part
+        import base64
+        args = json.loads(sys.argv[3]) if len(sys.argv) > 3 else {}
+        res = rpc("tools/call", {"name": "tool_call", "arguments": {"name": sys.argv[2], "arguments": args}})
+        r = res.get("result", res)
+        parts = r.get("content", []) if isinstance(r, dict) else []
+        imgs = [p for p in parts if isinstance(p, dict) and p.get("type") == "image"]
+        if not imgs:
+            print(text_of(res)); sys.exit(1)
+        open(sys.argv[4], "wb").write(base64.b64decode(imgs[0]["data"]))
+        print("saved", sys.argv[4])
     elif cmd == "raw":
         params = json.loads(sys.argv[3]) if len(sys.argv) > 3 else {}
         print(json.dumps(rpc(sys.argv[2], params), indent=1))
