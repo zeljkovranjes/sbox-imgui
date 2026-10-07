@@ -130,9 +130,9 @@ public static class ImGuiGallery
 		Win( "Inspector", new Vector2( 10, 350 ), new Vector2( 600, 380 ) );
 		if ( ImGui.Begin( "Inspector" ) )
 		{
-			var example = Game.ActiveScene?.GetAllComponents<Duccsoft.ImGui.Samples.ExampleComponent>().FirstOrDefault();
+			var example = Game.ActiveScene?.GetAllComponents<Duccsoft.ImGui.Components.ExampleComponent>().FirstOrDefault();
 			if ( example is null && Game.ActiveScene is not null )
-				example = Game.ActiveScene.CreateObject().Components.Create<Duccsoft.ImGui.Samples.ExampleComponent>();
+				example = Game.ActiveScene.CreateObject().Components.Create<Duccsoft.ImGui.Components.ExampleComponent>();
 			if ( example is null )
 				ImGui.TextDisabled( "(no ExampleComponent in scene)" );
 			else

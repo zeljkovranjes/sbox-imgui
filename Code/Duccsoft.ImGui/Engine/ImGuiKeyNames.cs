@@ -1,0 +1,120 @@
+namespace Duccsoft.ImGui.Engine;
+
+internal static class ImGuiKeyNames
+{
+	/// <summary>
+	/// Maps an <see cref="ImGuiKey"/> to the s&amp;box key name used by <c>Input.Keyboard</c> and UI button events.
+	/// </summary>
+	public static string ToSboxName( ImGuiKey key )
+	{
+		if ( key >= ImGuiKey.A && key <= ImGuiKey.Z )
+			return ((char)('a' + (key - ImGuiKey.A))).ToString();
+		if ( key >= ImGuiKey._0 && key <= ImGuiKey._9 )
+			return ((char)('0' + (key - ImGuiKey._0))).ToString();
+		if ( key >= ImGuiKey.F1 && key <= ImGuiKey.F12 )
+			return "f" + (1 + (key - ImGuiKey.F1));
+		if ( key >= ImGuiKey.Keypad0 && key <= ImGuiKey.Keypad9 )
+			return "pad_" + (key - ImGuiKey.Keypad0);
+
+		return key switch
+		{
+			ImGuiKey.Tab => "tab",
+			ImGuiKey.LeftArrow => "left",
+			ImGuiKey.RightArrow => "right",
+			ImGuiKey.UpArrow => "up",
+			ImGuiKey.DownArrow => "down",
+			ImGuiKey.PageUp => "pgup",
+			ImGuiKey.PageDown => "pgdn",
+			ImGuiKey.Home => "home",
+			ImGuiKey.End => "end",
+			ImGuiKey.Insert => "ins",
+			ImGuiKey.Delete => "delete",
+			ImGuiKey.Backspace => "backspace",
+			ImGuiKey.Space => "space",
+			ImGuiKey.Enter => "enter",
+			ImGuiKey.Escape => "escape",
+			ImGuiKey.LeftCtrl => "lctrl",
+			ImGuiKey.LeftShift => "shift",
+			ImGuiKey.LeftAlt => "alt",
+			ImGuiKey.LeftSuper => "lwin",
+			ImGuiKey.RightCtrl => "rctrl",
+			ImGuiKey.RightShift => "rshift",
+			ImGuiKey.RightAlt => "ralt",
+			ImGuiKey.RightSuper => "rwin",
+			ImGuiKey.Menu => "app",
+			ImGuiKey.Apostrophe => "'",
+			ImGuiKey.Comma => ",",
+			ImGuiKey.Minus => "-",
+			ImGuiKey.Period => ".",
+			ImGuiKey.Slash => "/",
+			ImGuiKey.Semicolon => "semicolon",
+			ImGuiKey.Equal => "=",
+			ImGuiKey.LeftBracket => "[",
+			ImGuiKey.Backslash => "\\",
+			ImGuiKey.RightBracket => "]",
+			ImGuiKey.GraveAccent => "`",
+			ImGuiKey.CapsLock => "capslock",
+			ImGuiKey.ScrollLock => "scrolllock",
+			ImGuiKey.NumLock => "numlock",
+			ImGuiKey.Pause => "break",
+			ImGuiKey.KeypadDecimal => "pad_decimal",
+			ImGuiKey.KeypadDivide => "pad_divide",
+			ImGuiKey.KeypadMultiply => "pad_multiply",
+			ImGuiKey.KeypadSubtract => "pad_minus",
+			ImGuiKey.KeypadAdd => "pad_plus",
+			ImGuiKey.KeypadEnter => "pad_enter",
+			ImGuiKey.MouseLeft => "mouseleft",
+			ImGuiKey.MouseRight => "mouseright",
+			ImGuiKey.MouseMiddle => "mousemiddle",
+			ImGuiKey.MouseX1 => "mouse4",
+			ImGuiKey.MouseX2 => "mouse5",
+			_ => null
+		};
+	}
+
+	/// <summary>
+	/// Maps an s&amp;box UI button name to an <see cref="ImGuiKey"/>.
+	/// </summary>
+	public static ImGuiKey FromSboxName( string name )
+	{
+		if ( string.IsNullOrEmpty( name ) )
+			return ImGuiKey.None;
+
+		name = name.ToLowerInvariant();
+		if ( name.Length == 1 )
+		{
+			var c = name[0];
+			if ( c >= 'a' && c <= 'z' ) return ImGuiKey.A + (c - 'a');
+			if ( c >= '0' && c <= '9' ) return ImGuiKey._0 + (c - '0');
+		}
+		if ( name.Length >= 2 && name[0] == 'f' && int.TryParse( name.AsSpan( 1 ), out var fn ) && fn >= 1 && fn <= 12 )
+			return ImGuiKey.F1 + (fn - 1);
+
+		return name switch
+		{
+			"tab" => ImGuiKey.Tab,
+			"left" => ImGuiKey.LeftArrow,
+			"right" => ImGuiKey.RightArrow,
+			"up" => ImGuiKey.UpArrow,
+			"down" => ImGuiKey.DownArrow,
+			"pgup" or "pageup" => ImGuiKey.PageUp,
+			"pgdn" or "pagedown" => ImGuiKey.PageDown,
+			"home" => ImGuiKey.Home,
+			"end" => ImGuiKey.End,
+			"ins" or "insert" => ImGuiKey.Insert,
+			"delete" or "del" => ImGuiKey.Delete,
+			"backspace" => ImGuiKey.Backspace,
+			"space" => ImGuiKey.Space,
+			"enter" or "return" => ImGuiKey.Enter,
+			"pad_enter" => ImGuiKey.KeypadEnter,
+			"escape" or "esc" => ImGuiKey.Escape,
+			"ctrl" or "lctrl" => ImGuiKey.LeftCtrl,
+			"rctrl" => ImGuiKey.RightCtrl,
+			"shift" or "lshift" => ImGuiKey.LeftShift,
+			"rshift" => ImGuiKey.RightShift,
+			"alt" or "lalt" => ImGuiKey.LeftAlt,
+			"ralt" => ImGuiKey.RightAlt,
+			_ => ImGuiKey.None
+		};
+	}
+}

@@ -24,8 +24,9 @@
       "IgnoreFolders": [],
       "DistinctAssemblyReferences": []
     },
-    "Summary": "Immediate-mode Dear ImGui (1.91 API) for s&box: windows, menus, popups, tables, tabs, inputs, sliders, color pickers, plots, drag & drop and a full demo window.",
-    "Description": "A C# port of the Dear ImGui API rendered through s&box's Painter. Call ImGui functions from any component's OnUpdate. See docs.md in the repository for usage of every widget.",
-    "WebsiteUrl": "https://github.com/zeljkovranjes/sbox-imgui"
+    "Summary": "Ports the Dear ImGui 1.91 immediate-mode GUI to C#: windows, widgets, tables, plots and a full demo window.",
+    "Description": "A C# port of the Dear ImGui 1.91 API, rendered through s&box's Painter. Call the static ImGui class from any component's OnUpdate; ImGuiSystem starts and draws the frame for you. Drop-in components show the demo window or inspect another component's properties without code. Needs no other libraries.",
+    "WebsiteUrl": "https://github.com/zeljkovranjes/sbox-imgui",
+    "Tags": [ "ui", "imgui", "immediate-mode", "debug", "inspector" ]
   }
 }
