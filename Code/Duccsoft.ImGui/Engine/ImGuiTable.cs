@@ -1,0 +1,71 @@
+namespace Duccsoft.ImGui.Engine;
+
+internal class ImGuiTable
+{
+	public int ID;
+	public ImGuiTableFlags Flags;
+	public int ColumnsCount;
+	public readonly List<ImGuiTableColumn> Columns = new();
+	public readonly List<int> DisplayOrderToIndex = new();
+	public ImRect OuterRect;
+	public ImRect InnerRect;
+	public ImRect WorkRect;
+	public ImRect InnerClipRect;
+	public ImGuiWindow OuterWindow;
+	public ImGuiWindow InnerWindow;
+	public float InnerWidth;
+	public bool IsFirstFrame = true;
+	public bool IsLayoutLocked;
+	public bool IsInsideRow;
+	public bool UsesChannels;
+	public int DeclColumnsCount;
+	public int CurrentRow = -1;
+	public int CurrentColumn = -1;
+	public ImGuiTableRowFlags RowFlags;
+	public ImGuiTableRowFlags LastRowFlags;
+	public float RowMinHeight;
+	public float RowPosY1, RowPosY2;
+	public float RowMaxY;
+	public float RowLogicalY;
+	public float RowFrozenOffset;
+	public bool RowIsFrozen;
+	public float RowTextBaseline;
+	public int RowBgColorCounter;
+	public Color32 RowBgColor0, RowBgColor1;
+	public readonly List<(int Column, Color32 Color)> CellBgColors = new();
+	public readonly List<(float Y, bool Strong)> RowLines = new();
+	public float StartY;
+	public float LastHeight;
+	public float HeaderBottomY;
+	public bool HasHeaders;
+	public int FreezeRowsRequest, FreezeColumnsRequest;
+	public int FreezeRows, FreezeColumns;
+	public float FrozenBottomY;
+	public float FrozenRightX;
+	public readonly Dictionary<int, float> FrozenRowHeights = new();
+	public float CellPaddingY;
+	public float ColumnsTotalWidth;
+	public float ColumnsMinX, ColumnsMaxX;
+	public int HoveredColumnBody = -1;
+	public int HoveredBorderColumn = -1;
+	public int HeldBorderColumn = -1;
+	public int ContextMenuColumn = -1;
+	public int ContextPopupId;
+	public int ReorderColumn = -1;
+	public bool HostSkipItems;
+	public int SortSpecsVersion;
+	public bool SortSpecsDirtyInternal = true;
+	public readonly ImGuiTableSortSpecs SortSpecs = new();
+
+	// Host backups
+	public Vector2 HostBackupCursorMaxPos;
+	public ImRect HostBackupWorkRect;
+	public ImRect HostBackupParentWorkRect;
+	public float HostBackupColumnsOffset;
+	public float HostBackupItemWidth;
+	public int HostBackupItemWidthStackCount;
+	public Vector2 HostBackupCurrLineSize;
+	public Vector2 HostBackupPrevLineSize;
+	public int HostBackupCurrentTableIdx;
+	public int InnerBackupCurrentTableIdx;
+}
