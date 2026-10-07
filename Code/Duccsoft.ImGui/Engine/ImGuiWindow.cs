@@ -5,7 +5,7 @@ internal class ImGuiWindow
 	public ImGuiWindow( ImGuiContext ctx, string name )
 	{
 		Name = name;
-		ID = ImGui.ImHashStr( name, 0 );
+		ID = ImHash.Str( name, 0 );
 		IDStack.Add( ID );
 		MoveId = GetID( "#MOVE" );
 		ScrollTarget = new Vector2( float.MaxValue, float.MaxValue );
@@ -115,22 +115,22 @@ internal class ImGuiWindow
 	public int GetID( string str )
 	{
 		int seed = IDStack[^1];
-		return ImGui.ImHashStr( str, seed );
+		return ImHash.Str( str, seed );
 	}
 
 	public int GetID( int n )
 	{
 		int seed = IDStack[^1];
-		return ImGui.ImHashInt( n, seed );
+		return ImHash.Int( n, seed );
 	}
 
 	public int GetIDFromRectangle( ImRect r )
 	{
 		int seed = IDStack[^1];
-		int h = ImGui.ImHashInt( (int)r.Min.x, seed );
-		h = ImGui.ImHashInt( (int)r.Min.y, h );
-		h = ImGui.ImHashInt( (int)r.Max.x, h );
-		return ImGui.ImHashInt( (int)r.Max.y, h );
+		int h = ImHash.Int( (int)r.Min.x, seed );
+		h = ImHash.Int( (int)r.Min.y, h );
+		h = ImHash.Int( (int)r.Max.x, h );
+		return ImHash.Int( (int)r.Max.y, h );
 	}
 
 	public override string ToString() => $"Window '{Name}' ({ID:X8})";
