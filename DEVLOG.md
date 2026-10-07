@@ -22,3 +22,7 @@ Journal for this library. Keep it current: decisions, engine gotchas, what faile
   `ImDrawList`). Compile warnings identical before and after (18). The editor rig host code compiles against the new
   build. Not re-run: the in-engine self-test (`dev/editor-rig/run-selftest.sh`) and the s&box whitelist compile.
   Next: open the package in the s&box editor and run the self-test to confirm 32/32 still pass.
+- 2026-10-06: the standard now allows facade partials `ImGui.<Part>.cs` and an `Api/` layer in the root namespace, so
+  the single 19k-line `ImGui.cs` was split back into the 29 original partials (Demo ones renamed `ImGui.DemoX.cs`: one
+  part segment only) and the 43 public types went one per file into `Api/`. Same checks as before: identical warnings,
+  host code builds, sbox-check passes.

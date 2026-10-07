@@ -12,9 +12,10 @@ s&box library `duccsoft.imgui`.
 - Imported package (Org `duccsoft`, Ident `imgui`, fork of chrisspieler/sbox-imgui). Never change Org/Ident.
 - The public API is the Dear ImGui API. User code depends on `Duccsoft.ImGui.ImGui` and every public type
   (enums, `ImGuiStyle`, `ImGuiIO`, `ImDrawList`, `ImRect`, `ImGuiPayload`, sort specs, callbacks, `ComponentExtensions`)
-  being in the root namespace. Namespace = folder path, so all of them, and every partial of the static `ImGui` class,
-  live in the facade `Code/Duccsoft.ImGui/ImGui.cs` (one `#region` per former file). Add new widgets there, in the
-  matching region. Never move a public type into a layer namespace: it breaks every user.
+  being in the root namespace. The static `ImGui` class is split into facade partials
+  `Code/Duccsoft.ImGui/ImGui.<Part>.cs` (one per widget family: `ImGui.Button.cs`, `ImGui.Table.cs`, `ImGui.DemoWidgets.cs`, ...);
+  the public types are one per file in `Api/` (namespace `Duccsoft.ImGui`). Add new widgets as a partial, new public
+  types in `Api/`. Never move a public type into a layer namespace: it breaks every user.
 - Internal state types (`ImGuiContext` and its partials, `ImGuiWindow`, `ImGuiTable`, `ImGuiTabBar`, ...) are in
   `Engine/`. They reference the facade's public types (enums, style); that is accepted.
 - No Core layer: every type uses s&box `Vector2`/`Color`, and `Assembly.cs` has `global using Sandbox;`. Do not
